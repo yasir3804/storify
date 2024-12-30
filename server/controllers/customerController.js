@@ -263,4 +263,73 @@ const getCustomersByUserId = async (req, res) => {
   }
 };
 
-module.exports = { createCustomerOrder, getCustomersByUserId, generateInvoice };
+const getCustomers = async (req, res) => {
+  try {
+    // Aggregate customers with a filter for those having a user_id
+    const customers = await Customer.aggregate([
+      {
+        $match: {
+          user_id: { $exists: true, $ne: null }, // Filters customers with non-null user_id
+        },
+      },
+    ]);
+    // Count the total number of matching customers
+    const totalCount = await Customer.countDocuments({
+      user_id: { $exists: true, $ne: null },
+    });
+    // Return the customers
+    res.status(200).json({
+      success: true,
+      message: "Customers retrieved successfully.",
+      data: {
+        customers,
+        totalCount,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching customers:", error);
+    res.status(500).json({
+      error: "An error occurred while fetching customers.",
+    });
+  }
+};
+
+const customerOrders = async (req, res) => {
+  try {
+    // Aggregate customers with a filter for those having a user_id
+    const customersOrders = await Order.aggregate([
+      {
+        $match: {
+          user_id: { $exists: true, $ne: null }, // Filters customers with non-null user_id
+        },
+      },
+    ]);
+
+    // Count the total number of matching customers
+    const totalCount = await Order.countDocuments({
+      user_id: { $exists: true, $ne: null },
+    });
+
+    // Return the customers along with the total count
+    res.status(200).json({
+      success: true,
+      message: "Orders retrieved successfully.",
+      data: {
+        customersOrders,
+        totalCount,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching customers:", error);
+    res.status(500).json({
+      error: "An error occurred while fetching customers.",
+    });
+  }
+};
+module.exports = {
+  createCustomerOrder,
+  getCustomersByUserId,
+  generateInvoice,
+  getCustomers,
+  customerOrders,
+};

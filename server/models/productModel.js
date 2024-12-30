@@ -18,10 +18,10 @@ const productSchema = mongoose.Schema(
       default: "SKU",
       trim: true,
     },
-    category: {
-      type: String,
-      required: [true, "Please add a category"],
-      trim: true,
+    category_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "Category",
     },
     quantity: {
       type: String,
